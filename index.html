@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Todo Project</title>
+    <style>
+        *{
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        .todo-container{
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .tasks-container{
+            background-color: #fff;
+            min-height: 40vh;
+            width: 80%;
+            max-width: 800px;
+            margin: 30px auto; 
+            padding: 20px;
+            border: 0;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .todo-navbar{
+            height: auto;
+            margin: 10px 0;
+            text-align: center;
+            display: grid;
+            grid-template-columns: repeat(3,1fr);
+            gap: 10px;
+            max-width: 600px;
+            margin: 20px auto;
+        }
+
+        .todo-navbar button{
+            border: 0;
+            margin: 0 5px;
+            padding: 12px 20px;
+            border-radius: 25px;
+            background: white;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .todo-navbar button:hover{
+            background: #007bff;
+            color: white;
+        }
+
+        .todo-navbar button.active{
+            background: #007bff;
+            color: white;
+        }
+
+        .add-tasks-container{
+            display: none;
+            justify-content: center;
+            text-align: left;
+            margin: 20px auto;
+            max-width: 500px;
+        }
+
+        .add-tasks-container div{
+            margin: 15px 0;
+        }
+
+        .add-tasks-container form{
+            background: white;
+            width: 100%;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .add-tasks-container .submit-btn{
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            cursor: pointer;
+            background: #007bff;
+            color: white;
+            font-weight: bold;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .add-tasks-container .submit-btn:hover{
+            background: #0056b3;
+        }
+
+        .add-tasks-container input{
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            padding: 12px;
+            outline: none;
+            color: black;
+            display: block;
+            width: 100%;
+            font-size: 16px;
+        }
+
+        .add-tasks-container textarea{
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            padding: 12px;
+            outline: none;
+            color: black;
+            display: block;
+            width: 100%;
+            font-size: 16px;
+            font-family: inherit;
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .add-tasks-container input:focus,
+        .add-tasks-container textarea:focus{
+            border-color: #007bff;
+        }
+
+        .task-item{
+            border: 1px solid #ddd;
+            margin: 10px 0;
+            padding: 15px;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: all 0.3s ease;
+        }
+
+        .task-item:hover{
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .task-item.completed{
+            background-color: #e8f5e8;
+            border-color: #28a745;
+        }
+
+        .task-item.completed .task-name{
+            text-decoration: line-through;
+            color: #6c757d;
+        }
+
+        .task-content{
+            display: flex;
+            align-items: center;
+            flex: 1;
+        }
+
+        .task-checkbox{
+            margin-right: 15px;
+            transform: scale(1.2);
+            cursor: pointer;
+        }
+
+        .task-info{
+            flex: 1;
+        }
+
+        .task-name{
+            font-weight: bold;
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+
+        .task-deadline{
+            color: #666;
+            font-size: 14px;
+        }
+
+        .task-date{
+            color: #999;
+            font-size: 12px;
+        }
+
+        .task-actions{
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .delete-btn{
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .delete-btn:hover{
+            background: #c82333;
+        }
+
+        .section-title{
+            text-align: center;
+            margin-bottom: 20px;
+            color: #333;
+            font-size: 24px;
+        }
+
+        .empty-message{
+            text-align: center;
+            padding: 40px;
+            color: #666;
+            font-style: italic;
+        }
+
+        .loading{
+            text-align: center;
+            padding: 20px;
+            color: #666;
+        }
+
+        .task-description{
+            color: #666;
+            font-size: 14px;
+            margin: 8px 0;
+            line-height: 1.5;
+            font-style: italic;
+            background-color: #f8f9fa;
+            padding: 8px 12px;
+            border-radius: 6px;
+            border-left: 3px solid #007bff;
+        }
+
+        .task-item.completed .task-description{
+            background-color: #e8f5e8;
+            border-left-color: #28a745;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+    <div class="todo-container">
+        <h1 style="text-align: center; color: white; margin-bottom: 20px;">TodoList</h1>
+        
+        <div class="todo-navbar">
+            <button class="alltask-btn active">All Tasks</button>
+            <button class="add-btn">Add Tasks</button>
+            <button class="com-btn">Completed Tasks</button>
+        </div>
+
+        <div class="add-tasks-container">
+            <form id="addTaskForm">
+               <div>
+                 <label for="taskName">Task Name</label>
+                 <input id="taskName" name="taskName" placeholder="Enter task name" type="text" required>
+               </div>
+
+                <div>
+                    <label for="description">Description</label>
+                    <textarea id="description" name="description" placeholder="Enter task description (optional)" rows="3"></textarea>
+                </div>
+
+                <div>
+                    <label for="deadline">Deadline</label> 
+                    <input type="text" id="deadline" name="deadline" placeholder="Enter deadline (e.g., Tomorrow, Next week)">
+                </div>
+                            
+                <div>
+                    <button type="submit" class="submit-btn">Add Task</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="tasks-container">
+            <div class="loading">Loading tasks...</div>
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const tasksContainer = document.querySelector(".tasks-container");
+        const alltaskBtn = document.querySelector(".alltask-btn");
+        const addBtn = document.querySelector(".add-btn");
+        const comBtn = document.querySelector(".com-btn");
+        const addTaskFormEl = document.getElementById('addTaskForm');
+
+        // Event Listeners
+        addTaskFormEl.addEventListener('submit', handleFormSubmit);
+        alltaskBtn.addEventListener("click", () => showSection('all'));
+        addBtn.addEventListener("click", () => showSection('add'));
+        comBtn.addEventListener("click", () => showSection('completed'));
+
+        // Show initial section
+        showSection('all');
+
+        function showSection(section) {
+            // Update button states
+            document.querySelectorAll('.todo-navbar button').forEach(btn => btn.classList.remove('active'));
+            
+            if (section === 'all') {
+                alltaskBtn.classList.add('active');
+                document.querySelector('.tasks-container').style.display = "block";
+                document.querySelector('.add-tasks-container').style.display = "none";
+                loadAllTasks();
+            } else if (section === 'add') {
+                addBtn.classList.add('active');
+                document.querySelector('.tasks-container').style.display = "none";
+                document.querySelector('.add-tasks-container').style.display = "flex";
+            } else if (section === 'completed') {
+                comBtn.classList.add('active');
+                document.querySelector('.tasks-container').style.display = "block";
+                document.querySelector('.add-tasks-container').style.display = "none";
+                loadCompletedTasks();
+            }
+        }
+
+        async function handleFormSubmit(event) {
+            event.preventDefault();
+            
+            const formData = new FormData(addTaskFormEl);
+            const taskName = formData.get('taskName');
+            const description = formData.get('description');
+            const deadline = formData.get('deadline');
+            
+            console.log('Form data being sent:');
+            console.log('Task Name:', taskName);
+            console.log('Description:', description);
+            console.log('Deadline:', deadline);
+            
+            const requestBody = { taskName, description, deadline };
+            console.log('Request body:', requestBody);
+            
+            try {
+                const response = await fetch('/api/tasks', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(requestBody)
+                });
+                
+                const result = await response.json();
+                console.log('Server response:', result);
+                
+                if (result.success) {
+                    alert("Task added successfully!");
+                    addTaskFormEl.reset();
+                    showSection('all'); // Switch to all tasks view
+                } else {
+                    alert("Error adding task. Please try again.");
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert("Error adding task. Please try again.");
+            }
+        }
+
+        async function loadAllTasks() {
+            try {
+                tasksContainer.innerHTML = '<div class="loading">Loading tasks...</div>';
+                
+                const response = await fetch('/api/tasks');
+                const tasks = await response.json();
+                
+                if (tasks.length === 0) {
+                    tasksContainer.innerHTML = '<div class="empty-message">No tasks found. Add some tasks!</div>';
+                    return;
+                }
+                
+                let tasksHTML = '<h2 class="section-title">All Tasks</h2>';
+                tasks.forEach(task => {
+                    const date = new Date(task.createdAt).toLocaleDateString();
+                    const isCompleted = task.isCompleted ? 'completed' : '';
+                    const checked = task.isCompleted ? 'checked' : '';
+                    
+                    tasksHTML += `
+                        <div class="task-item ${isCompleted}" data-id="${task._id}">
+                            <div class="task-content">
+                                <input type="checkbox" class="task-checkbox" ${checked} onchange="toggleTaskStatus('${task._id}', this.checked)">
+                                <div class="task-info">
+                                    <div class="task-name">${task.taskName}</div>
+                                    ${task.description ? `<div class="task-description">${task.description}</div>` : ''}
+                                    ${task.deadline ? `<div class="task-deadline">Deadline: ${task.deadline}</div>` : ''}
+                                    <div class="task-date">Created: ${date}</div>
+                                </div>
+                            </div>
+                            <div class="task-actions">
+                                <button class="delete-btn" onclick="deleteTask('${task._id}')">Delete</button>
+                            </div>
+                        </div>
+                    `;
+                });
+                tasksContainer.innerHTML = tasksHTML;
+            } catch (error) {
+                console.error('Error loading tasks:', error);
+                tasksContainer.innerHTML = '<div class="empty-message">Error loading tasks</div>';
+            }
+        }
+
+        async function loadCompletedTasks() {
+            try {
+                tasksContainer.innerHTML = '<div class="loading">Loading completed tasks...</div>';
+                
+                const response = await fetch('/api/tasks/completed');
+                const tasks = await response.json();
+                
+                if (tasks.length === 0) {
+                    tasksContainer.innerHTML = '<div class="empty-message">No completed tasks found.</div>';
+                    return;
+                }
+                
+                let tasksHTML = '<h2 class="section-title">Completed Tasks</h2>';
+                tasks.forEach(task => {
+                    const completedDate = new Date(task.completedAt).toLocaleDateString();
+                    const createdDate = new Date(task.createdAt).toLocaleDateString();
+                    
+                    tasksHTML += `
+                        <div class="task-item completed" data-id="${task._id}">
+                            <div class="task-content">
+                                <input type="checkbox" class="task-checkbox" checked onchange="toggleTaskStatus('${task._id}', this.checked)">
+                                <div class="task-info">
+                                    <div class="task-name">${task.taskName}</div>
+                                    ${task.description ? `<div class="task-description">${task.description}</div>` : ''}
+                                    ${task.deadline ? `<div class="task-deadline">Deadline: ${task.deadline}</div>` : ''}
+                                    <div class="task-date">Completed: ${completedDate} | Created: ${createdDate}</div>
+                                </div>
+                            </div>
+                            <div class="task-actions">
+                                <button class="delete-btn" onclick="deleteTask('${task._id}')">Delete</button>
+                            </div>
+                        </div>
+                    `;
+                });
+                tasksContainer.innerHTML = tasksHTML;
+            } catch (error) {
+                console.error('Error loading completed tasks:', error);
+                tasksContainer.innerHTML = '<div class="empty-message">Error loading completed tasks</div>';
+            }
+        }
+
+        async function toggleTaskStatus(taskId, isCompleted) {
+            try {
+                const response = await fetch(`/api/tasks/${taskId}/status`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ isCompleted })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    // Refresh the current view
+                    const activeButton = document.querySelector('.todo-navbar button.active');
+                    if (activeButton === alltaskBtn) {
+                        loadAllTasks();
+                    } else if (activeButton === comBtn) {
+                        loadCompletedTasks();
+                    }
+                } else {
+                    alert("Error updating task status");
+                }
+            } catch (error) {
+                console.error('Error updating task status:', error);
+                alert("Error updating task status");
+            }
+        }
+
+        async function deleteTask(taskId) {
+            if (!confirm("Are you sure you want to delete this task?")) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/api/tasks/${taskId}`, {
+                    method: 'DELETE'
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    // Refresh the current view
+                    const activeButton = document.querySelector('.todo-navbar button.active');
+                    if (activeButton === alltaskBtn) {
+                        loadAllTasks();
+                    } else if (activeButton === comBtn) {
+                        loadCompletedTasks();
+                    }
+                } else {
+                    alert("Error deleting task");
+                }
+            } catch (error) {
+                console.error('Error deleting task:', error);
+                alert("Error deleting task");
+            }
+        }
+    </script>
+</body>
+</html>
