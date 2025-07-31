@@ -366,8 +366,11 @@
                 tasksContainer.innerHTML = '<div class="loading">Loading tasks...</div>';
                 
                 const response = await fetch('/api/tasks');
+                console.log(response);
+
                 const tasks = await response.json();
-                
+                console.log(tasks);
+
                 if (tasks.length === 0) {
                     tasksContainer.innerHTML = '<div class="empty-message">No tasks found. Add some tasks!</div>';
                     return;
